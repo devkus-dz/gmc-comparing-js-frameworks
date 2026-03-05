@@ -1,0 +1,98 @@
+<div class="container mx-auto p-6 max-w-6xl space-y-8">
+  <div class="p-4 bg-slate-100 rounded-lg border border-slate-200 space-y-4">
+    <h2 class="text-xl font-bold">Benchmark Controls</h2>
+    <div class="flex flex-wrap gap-2">
+      <button
+        class="inline-flex items-center justify-center rounded-md text-sm font-medium border border-slate-200 bg-white hover:bg-slate-100 h-9 px-4 py-2"
+        (click)="loadTasks(100)">Load 100 Tasks</button>
+      <button
+        class="inline-flex items-center justify-center rounded-md text-sm font-medium border border-slate-200 bg-white hover:bg-slate-100 h-9 px-4 py-2"
+        (click)="loadTasks(500)">Load 500 Tasks</button>
+      <button
+        class="inline-flex items-center justify-center rounded-md text-sm font-medium border border-slate-200 bg-white hover:bg-slate-100 h-9 px-4 py-2"
+        (click)="loadTasks(1000)">Load 1000 Tasks</button>
+      <button
+        class="inline-flex items-center justify-center rounded-md text-sm font-medium bg-slate-200 text-slate-900 hover:bg-slate-300 h-9 px-4 py-2 disabled:opacity-50"
+        [disabled]="tasks().length < 50" (click)="bulkUpdate50()">Update 50 Tasks</button>
+      <button
+        class="inline-flex items-center justify-center rounded-md text-sm font-medium bg-red-500 text-white hover:bg-red-600 h-9 px-4 py-2 disabled:opacity-50"
+        [disabled]="tasks().length < 50" (click)="bulkDelete50()">Delete 50 Tasks</button>
+      <button
+        class="inline-flex items-center justify-center rounded-md text-sm font-medium hover:bg-slate-100 h-9 px-4 py-2"
+        (click)="tasks.set([])">Clear</button>
+    </div>
+    <div class="text-sm font-mono bg-white p-2 rounded shadow-sm inline-block">
+      Last DOM Render Time: <span class="text-blue-600 font-bold">{{ lastRenderTime() }} ms</span>
+      <span class="text-slate-400 ml-2">| Total Nodes: {{ filteredTasks().length }}</span>
+    </div>
+  </div>
+
+  <div class="flex flex-col md:flex-row justify-between gap-4 bg-white p-4 rounded-lg shadow-sm border">
+    <input type="text" placeholder="Search tasks..." [(ngModel)]="searchTerm"
+      class="flex h-9 w-full max-w-sm rounded-md border border-slate-200 bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950" />
+
+    <div class="flex gap-2">
+      <input type="text" placeholder="New task name" [(ngModel)]="newTaskName"
+        class="flex h-9 w-48 rounded-md border border-slate-200 bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950" />
+      <select [(ngModel)]="newTaskPriority"
+        class="flex h-9 w-28 items-center justify-between rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950">
+        <option value="Low">Low</option>
+        <option value="Medium">Medium</option>
+        <option value="High">High</option>
+      </select>
+      <button
+        class="inline-flex items-center justify-center rounded-md text-sm font-medium bg-slate-900 text-white hover:bg-slate-800 h-9 px-4 py-2"
+        (click)="addTask()">Add Task</button>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
+    <div class="max-h-[600px] overflow-y-auto">
+      <table class="w-full caption-bottom text-sm">
+        <thead class="sticky top-0 bg-slate-50 z-10">
+          <tr class="border-b transition-colors">
+            <th class="h-10 px-4 text-left align-middle font-medium text-slate-500">Task Name</th>
+            <th class="h-10 px-4 text-left align-middle font-medium text-slate-500">Priority</th>
+            <th class="h-10 px-4 text-right align-middle font-medium text-slate-500">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (filteredTasks().length === 0) {
+          <tr>
+            <td colspan="3" class="p-4 text-center py-8 text-slate-500">
+              No tasks found. Use the benchmark controls to load data.
+            </td>
+          </tr>
+          } @else {
+          @for (task of filteredTasks(); track task.id) {
+          <tr class="border-b transition-colors hover:bg-slate-50">
+            <td class="p-4 align-middle font-medium">{{ task.name }}</td>
+            <td class="p-4 align-middle">
+              <span class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold" [ngClass]="{
+                      'bg-red-500 text-white border-transparent': task.priority === 'High',
+                      'bg-slate-900 text-white border-transparent': task.priority === 'Medium',
+                      'bg-slate-100 text-slate-900 border-transparent': task.priority === 'Low'
+                    }">
+                {{ task.priority }}
+              </span>
+            </td>
+            <td class="p-4 align-middle text-right space-x-2">
+              <button
+                class="inline-flex items-center justify-center rounded-md text-xs font-medium border border-slate-200 bg-white hover:bg-slate-100 h-8 px-3"
+                (click)="togglePriority(task.id)">
+                Change Priority
+              </button>
+              <button
+                class="inline-flex items-center justify-center rounded-md text-xs font-medium bg-red-500 text-white hover:bg-red-600 h-8 px-3"
+                (click)="deleteTask(task.id)">
+                Delete
+              </button>
+            </td>
+          </tr>
+          }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
